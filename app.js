@@ -18,9 +18,32 @@ app.route("/").get(function (req, res) {
   res.render("home");
 });
 
-app.route("/login").get(function (req, res) {
-  res.render("login");
-});
+app
+  .route("/login")
+  .get(function (req, res) {
+    res.render("login");
+  })
+  .post(function (req, res) {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    User.findOne({ email: email }, function (err, user) {
+      if (err) {
+        console.log(err);
+        res.redirect("/login");
+      } else {
+        if (user) {
+          if (user.password === password) {
+            res.render("secrets");
+          } else {
+            res.redirect("/login");
+          }
+        } else {
+          res.redirect("/login");
+        }
+      }
+    });
+  });
 
 app
   .route("/register")
