@@ -11,6 +11,9 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true })); // Required to parse requests
 app.use(express.static("public"));
 
+const models = require(__dirname + "/models.js");
+const User = models.User;
+
 app.route("/").get(function (req, res) {
   res.render("home");
 });
@@ -19,9 +22,24 @@ app.route("/login").get(function (req, res) {
   res.render("login");
 });
 
-app.route("/register").get(function (req, res) {
-  res.render("register");
-});
+app
+  .route("/register")
+  .get(function (req, res) {
+    res.render("register");
+  })
+  .post(function (req, res) {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    User.create({ email: email, password: password }, function (err, user) {
+      if (err) {
+        console.log(err);
+        res.redirect("/login");
+      } else {
+        res.render("secrets");
+      }
+    });
+  });
 
 // HTTPS config
 const httpsPort = process.env.HTTPS_PORT || 443;
